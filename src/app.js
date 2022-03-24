@@ -8,7 +8,6 @@ db();
 
 app.set("port", 9000);
 
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));

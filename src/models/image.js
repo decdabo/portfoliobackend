@@ -1,16 +1,12 @@
 const { Schema, model } = require('mongoose');
 
 const imagesSchema = Schema({
-  section: {
+  email: {
     type: String,
     require: true
   },
-  imageURL: {
-    type: String,
-    require: true
-  },
-  publicID: {
-    type: String,
+  images: {
+    type: Object,
     require: true
   }
 });

@@ -1,94 +1,116 @@
 const { response } = require('express');
-const { find } = require('../models/image');
 const Image = require('../models/image');
 
 const postSectionImage = async(req, res = response) => {
+  const { section } = req.params
+  const { email, image } = req.body;
   try {
-    const { section, imageURL, publicID } = req.body;
-    const validImage = await Image.findOne({ publicID });
-    if(validImage) {
-      return res.status(400).json({ 
-        ok: false, 
-        msg:'This image already exists' 
-      });
-    }
-  
-    const image = new Image(req.body);
-    await image.save();
+    const data = await Image.findOne({ email });
+
+    if(!data) return res.status(400).json({ ok: false, msg:'User not exists' });
     
-    res.status(200).json({
-      ok: true,
-      data: {
-        section,
-        imageURL,
-        publicID
-      }
-    });
+    switch (section) {
+      case "home":
+        data.overwrite({ 
+          email: data.email ,
+          images: { 
+            home: image,
+            about: data.images.about,
+            skills: data.images.skills,
+            contact: data.images.contact,
+         }})
+        await data.save();
+        
+        return res.status(200).json({
+          ok:true,
+          data
+        })
+      case "about":
+        data.overwrite({ 
+          email: data.email ,
+          images: { 
+            home: data.images.home,
+            about: image,
+            skills: data.images.skills,
+            contact: data.images.contact,
+         }})
+        await data.save();
+        
+        return res.status(200).json({
+          ok:true,
+          data
+        })
+      case "skills":
+        data.overwrite({ 
+          email: data.email ,
+          images: { 
+            home: data.images.home,
+            about: data.images.about,
+            skills: image,
+            contact: data.images.contact,
+         }})
+        await data.save();
+        
+        return res.status(200).json({
+          ok:true,
+          data
+        })
+      case "contact":
+        data.overwrite({ 
+          email: data.email ,
+          images: { 
+            home: data.images.home,
+            about: data.images.about,
+            skills: data.images.skills,
+            contact: image,
+         }})
+        await data.save();
+        
+        return res.status(200).json({
+          ok:true,
+          data
+        })
+      default:
+        return res.status(400).json({ ok: false, msg: 'This section not exists' });
+    }
+    
   } catch (error) {
     console.log(error)
   }
 }
 
-const deleteSectionImage = async(req, res = response) => {
+const getSectionImages = async (req, res = response) => {
   try {
-    const { publicID } = req.body;
-    const image = await Image.findOne({ publicID });
-    if(!image) {
-      return res.status(400).json({ 
-        ok: false,
-        msg: "This image doesn't exists", 
-      });
-    }
-
-    await Image.deleteOne({ publicID });
+    const param = req.params.email 
+    const validEmail = await Image.findOne({ email: param });
+    
+    if (!validEmail) return res.status(400).json({ ok: false, msg: "This user with this email doesn't exists" })
     
     return res.status(200).json({
       ok: true,
-      msg: 'Image delete!',
+      data: validEmail,
     })
   } catch (error) {
     console.log(error)
   }
 }
 
-const getSectionImages = async(req, res = response) => {
-  if (req.body.section) {
-    try {
-      const { section } = req.body;
-      const image = await Image.find({ section });
-
-      if(!image) return res.status(400).json({
-        ok: false,
-        msg: 'No images in this section yet'
-      })
-
-      return res.status(200).json({
-        ok: true,
-        data: image
-      });
-    } catch (error) {
-      console.log(error)
-    }
-  }else {
-    try {
-      const images = await Image.find();
-      if(!images) return res.status(400).json({
-        ok: false,
-        msg: 'No images yet'
-      });
-
-      return res.status(200).json({
-        ok: true,
-        data: images
-      })
-    } catch (error) {
-      console.log(error)
-    }
+const getAllImages = async (_, res = response) => {
+  try {
+    const images = await Image.findOne({ email: process.env.ADMIN_EMAIL });
+    if (!images) return res.json({ ok: false, msg: 'No user with data' })
+  
+    return res.json({
+      ok: true,
+      data: images
+    })
+  } catch (error) {
+    console.log
   }
 }
 
 module.exports = {
   postSectionImage,
-  deleteSectionImage,
-  getSectionImages
+  getSectionImages,
+  getAllImages
 }
