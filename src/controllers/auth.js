@@ -9,10 +9,22 @@ const createUser = async(req, res = response) => {
   const initialImages = {
     email,
     images: {
-      home: "",
-      about: "",
-      skills: "",
-      contact: ""
+      home: {
+        cloudinaryId: "",
+        imageURL: ""
+      },
+      about: {
+        cloudinaryId: "",
+        imageURL: ""
+      },
+      skills: {
+        cloudinaryId: "",
+        imageURL: ""
+      },
+      contact: {
+        cloudinaryId: "",
+        imageURL: ""
+      }
     }
   }
   try {

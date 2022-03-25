@@ -4,8 +4,8 @@ const ajv = new Ajv();
 const imagePostSchema = {
   type: 'object',
   properties: {
-      email: { type: 'string' },
-      image: { type: 'string' },
+    email: { type: 'string' },
+    image: { type: 'object' }
   },
   required: ['email', 'image'],
   additionalProperties: false
