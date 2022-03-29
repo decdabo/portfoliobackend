@@ -14,7 +14,7 @@ cloudinary.config({
   secure: true
 });
 
-app.set("port", 9000);
+app.set("port", process.env.MAIN_ENDPOINT);
 
 app.use(cors())
 app.use(express.json({ limit: '50mb' }));
