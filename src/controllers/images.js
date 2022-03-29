@@ -1,5 +1,6 @@
 const { response } = require('express');
 const Image = require('../models/image');
+const cloudinary = require('cloudinary').v2;
 
 const postSectionImage = async(req, res = response) => {
   const { section } = req.params
@@ -7,14 +8,24 @@ const postSectionImage = async(req, res = response) => {
   try {
     const data = await Image.findOne({ email });
 
-    if(!data) return res.status(400).json({ ok: false, msg:'User not exists' });
-    
+    if(!data) return res.status(403).json({ ok: false, msg:'User not exists' });
+    if( data.images[section].cloudinaryId.length ) {
+      await cloudinary.uploader.destroy(data.images[section].cloudinaryId);
+    }
+
+    const { public_id, url } = await cloudinary.uploader.upload(image.imageURL);
+
+    const imageData = {
+      cloudinaryId: public_id,
+      imageURL: url
+    }
+
     switch (section) {
       case "home":
         data.overwrite({ 
           email: data.email ,
           images: { 
-            home: image,
+            home: imageData,
             about: data.images.about,
             skills: data.images.skills,
             contact: data.images.contact,
@@ -30,7 +41,7 @@ const postSectionImage = async(req, res = response) => {
           email: data.email ,
           images: { 
             home: data.images.home,
-            about: image,
+            about: imageData,
             skills: data.images.skills,
             contact: data.images.contact,
          }})
@@ -46,7 +57,7 @@ const postSectionImage = async(req, res = response) => {
           images: { 
             home: data.images.home,
             about: data.images.about,
-            skills: image,
+            skills: imageData,
             contact: data.images.contact,
          }})
         await data.save();
@@ -62,7 +73,7 @@ const postSectionImage = async(req, res = response) => {
             home: data.images.home,
             about: data.images.about,
             skills: data.images.skills,
-            contact: image,
+            contact: imageData,
          }})
         await data.save();
         
@@ -84,7 +95,7 @@ const getSectionImages = async (req, res = response) => {
     const param = req.params.email 
     const validEmail = await Image.findOne({ email: param });
     
-    if (!validEmail) return res.status(400).json({ ok: false, msg: "This user with this email doesn't exists" })
+    if (!validEmail) return res.status(403).json({ ok: false, msg: "This user with this email doesn't exists" })
     
     return res.status(200).json({
       ok: true,
@@ -102,7 +113,7 @@ const getAllImages = async (_, res = response) => {
   
     return res.json({
       ok: true,
-      data: images
+      data: images.images
     })
   } catch (error) {
     console.log

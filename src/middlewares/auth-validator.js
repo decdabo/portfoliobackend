@@ -6,7 +6,8 @@ const authCreateSchema = {
   properties: {
     name: { type: 'string' },
     email: { type: 'string' },
-    password: { type: 'string' }
+    password: { type: 'string' },
+    access: { type: 'boolean' }
   },
   required: ['name', 'email', 'password'],
   additionalProperties: false

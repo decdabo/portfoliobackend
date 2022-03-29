@@ -12,6 +12,10 @@ const userSchema = Schema({
   password: {
     type: String,
     require: true
+  },
+  access: {
+    type: Boolean,
+    require: false
   }
 });
 

@@ -29,14 +29,8 @@ const createUser = async(req, res = response) => {
   }
   try {
     const userValidation = await User.findOne({ email });
-    if( email.length < 5) {
-      return res.status(400).json({
-        status: false,
-        msg: 'Send a valid email'
-      });
-    }
     if(userValidation){
-      return res.status(400).json({
+      return res.status(200).json({
         status: false,
         msg: 'User already exists'
       });
@@ -97,17 +91,17 @@ const loginUser = async(req, res = response) => {
     const { email, password } = req.body;
     const userValidation = await User.findOne({ email });
     if(!userValidation){
-      return res.status(400).json({
+      return res.status(200).json({
         status: false,
         msg: 'Email or password wrong'
       });
     };
     
     const passwordValidator = bcrypt.compareSync(password, userValidation.password);
-    if (!passwordValidator) return res.status(400).json({ ok: false, msg: 'Email or password wrong' });
+    if (!passwordValidator) return res.status(200).json({ status: false, msg: 'Email or password wrong' });
 
     return res.status(200).json({
-      ok: true,
+      status: true,
       msg: 'Logged!',
       name: userValidation.name,
       email: userValidation.email,
