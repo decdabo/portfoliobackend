@@ -95,7 +95,7 @@ const getSectionImages = async (req, res = response) => {
     const param = req.params.email 
     const validEmail = await Image.findOne({ email: param });
     
-    if (!validEmail) return res.status(403).json({ ok: false, msg: "This user with this email doesn't exists" })
+    if (!validEmail) return res.status(200).json({ ok: false, msg: "This user with this email doesn't exists" })
     
     return res.status(200).json({
       ok: true,
